@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.mapper.DishMapper">
+
+    <!--    设置useGeneratedKeys和keyProperty两个参数的目的是将菜品数据插入到数据表中后返回该条数据的id主键值,用于口味表插入时作为外键-->
+    <insert id="saveWithFlavors" useGeneratedKeys="true" keyProperty="id">
+        insert into dish(name, category_id, price, image, description, status, create_time, update_time, create_user,
+                         update_user)
+        VALUES (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime},
+                #{createUser}, #{updateUser})
+    </insert>
+
+    <update id="updateDishById">
+        update dish
+        <set>
+            <if test="name!=null and name!=''">,name =
+            #{name}</if>
+            <if test="categoryId!=null">,category_id =
+            #{categoryId}</if>
+            <if test="price!=null">,price =
+            #{price}</if>
+            <if test="image!=null and image!=''">,image =
+            #{image}</if>
+            <if test="description!=null and description!=''">,description =
+            #{description}</if>
+            <if test="status!=null">,status =
+            #{status}</if>
+            <if test="createTime!=null">,create_time =
+            #{createTime}</if>
+            <if test="updateTime!=null">,update_time =
+            #{updateTime}</if>
+            <if test="createUser!=null">,create_user =
+            #{createUser}</if>
+            <if test="updateUser!=null">,update_user =
+            #{updateUser}</if>
+        </set>
+        where id =#{id}
+    </update>
+
+    <delete id="deleteByIds">
+        delete from dish where id in
+        <foreach collection="ids" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--    使用dish表和category表左连接查询,查询字段为dish表中的所有字段以及category表的name字段,-->
+    <!--    为了将category的name和dish的name区分,给category的name取一个category_name别名.-->
+    <select id="page" resultType="com.sky.vo.DishVO">
+        select d.* , c.name category_name from dish d left join category c on d.category_id = c.id
+        <where>
+            <if test="name != null and name !=''">and d.name like concat('%',
+            #{name},
+            '%'
+            )</if>
+            <if test="categoryId != null">and d.category_id =
+            #{categoryId}</if>
+            <if test="status">and d.status =
+            #{status}</if>
+        </where>
+    </select>
+
+    <select id="getStatusById" resultType="java.lang.Integer">
+        select status from dish where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="list" resultType="com.sky.entity.Dish">
+        select * from dish
+        <where>
+            <if test="name != null and name!=''">and name like concat('%',#{name},'%')</if>
+            <if test="categoryId !=null">and category_id=#{categoryId}</if>
+            <if test="status !=null">and status=#{status}</if>
+        </where>
+    </select>
+
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from dish
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+</mapper>
