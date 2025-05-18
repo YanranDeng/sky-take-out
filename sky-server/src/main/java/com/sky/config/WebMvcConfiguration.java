@@ -1,7 +1,6 @@
 package com.sky.config;
 
 import com.sky.interceptor.JwtTokenAdminInterceptor;
-import com.sky.interceptor.JwtTokenUserInterceptor;
 import com.sky.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
-    @Autowired
-    private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+
 
     /**
      * 注册自定义拦截器
@@ -46,14 +44,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/admin/**")
                 // 设置拦截路径白名单,管理端为登录路径不拦截
                 .excludePathPatterns("/admin/employee/login");
-
-        // 用户端
-        registry.addInterceptor(jwtTokenUserInterceptor)
-                // 设置用户端拦截器拦截路径
-                .addPathPatterns("/user/**")
-                // 设置拦截路径白名单,用户端由两个白名单路径,分别是微信小程序登录路径和微信小程序查询营业状态的路径,前者和管理端一致,后者是用户端特有的.
-                .excludePathPatterns("/user/user/login")
-                .excludePathPatterns("/user/shop/status");
     }
 
 
@@ -112,23 +102,23 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * @param registry
      */
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("开始设置静态资源映射...");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     /**
-     * 拓展MVC消息转化器,目前用于格式化后端响应给前端的实体类对象的时间属性
-     * 重写WebMvcConfigurationSupport类的extendMessageConverters方法
-     *
+     * 扩展Spring MVC框架的消息转化器
      * @param converters
      */
+
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // 创建一个消息转化器对象
-        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-        // 创建一个对象转化器,并将该对象转化器传给消息转化器
-        messageConverter.setObjectMapper(new JacksonObjectMapper());
-        // 将自定义的消息转化器方法消息转化器列表的第一位上,Spring项目启动后会自动启用第一位的消息转化器(也即本自定义转化器)
-        converters.add(0, messageConverter);
+        //创建一个消息转换器对象
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        //需要为消息转换器设置一个对象转换器，对象转换器可以将java序列化为json数据
+        converter.setObjectMapper(new JacksonObjectMapper());
+        //将自己的消息转换器加入容器中
+        converters.add(0,converter);
     }
 }

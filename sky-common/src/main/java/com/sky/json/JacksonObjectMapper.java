@@ -1,5 +1,5 @@
 package com.sky.json;
-
+//固定操作
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;

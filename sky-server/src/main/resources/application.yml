@@ -4,28 +4,41 @@ server:
 spring:
   profiles:
     active: dev
+    include:
+      - env # 在当前目录下新建 application-env.yml 配置敏感信息
   main:
     allow-circular-references: true
   datasource:
-    druid:
-      driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver # 驱动名称
+    url: jdbc:mysql://localhost:3306/sky_take_out
+    username: root
+    password: "HUNter0409"
+    type: com.alibaba.druid.pool.DruidDataSource
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      timeout: 3000ms
 
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 100MB
+# knife4j配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: "default"
+      paths-to-match: "/**"
+      packages-to-scan: com.github.xiaoymin.boot3
+  default-flat-param-object: true
 
-  #  配置redis连接参数
-  redis:
-    host: ${sky.redis.host}
-    database: ${sky.redis.database}
-    port: ${sky.redis.port}
-    password: ${sky.redis.password}
-
-
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
 
 mybatis:
   #mapper配置文件
@@ -48,36 +61,10 @@ sky:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: itcast
     # 设置jwt过期时间
-    admin-ttl: 604800000
+    admin-ttl: 7200000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
-
-    #    设置用户端的jwt令牌配置
-    user-secret-key: itheima
+    # 小程序的jwt配置
+    user-secret-key: itcast
+    user-ttl: 7200000
     user-token-name: authentication
-    user-ttl: 604800000
-
-  alioss:
-    access-key-id: ${sky.alioss.access-key-id}
-    access-key-secret: ${sky.alioss.access-key-secret}
-    bucket-name: ${sky.alioss.bucket-name}
-    endpoint: ${sky.alioss.endpoint}
-
-
-  wechat:
-    appid: ${sky.wechat.appid}
-    secret: ${sky.wechat.secret}
-
-    refund-notify-url: ${sky.wechat.refund-notify-url}
-    we-chat-pay-cert-file-path: ${sky.wechat.we-chat-pay-cert-file-path}
-    private-key-file-path: ${sky.wechat.private-key-file-path}
-    notify-url: ${sky.wechat.notify-url}
-    mchid: ${sky.wechat.mchid}
-    mch-serial-no: ${sky.wechat.mch-serial-no}
-    api-v3-key: ${sky.wechat.api-v3-key}
-
-  #    百度地图派送范围检验
-  shop:
-    address: ${sky.shop.address}
-    ak: ${sky.baidu.ak}
-
