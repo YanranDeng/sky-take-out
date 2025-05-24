@@ -11,22 +11,4 @@ import java.util.List;
 public interface DishService {
     void saveWithFlavors(DishDTO dishDTO);
 
-    PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO);
-
-    void deleteBatch(List<Long> ids);
-
-    DishVO getDishWithFlavor(Long id);
-
-    void updateDishWithFlavor(DishDTO dishDTO);
-
-    /**
-     * 条件查询菜品和口味
-     * @param dish
-     * @return
-     */
-    List<DishVO> listWithFlavor(Dish dish);
-
-    List<Dish> getByCategoryId(DishDTO dishDTO);
-
-    void updateDishStatus(Dish dish);
 }
