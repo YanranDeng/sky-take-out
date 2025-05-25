@@ -8,6 +8,4 @@ sky:
     password: "HUNter0409"
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5t94YrdJHRH8fknrojnE
-    access-key-secret: 5CQJOQVTWBCthPks8jUZUe0MiM72yb
     bucket-name: sky-take-out-523
