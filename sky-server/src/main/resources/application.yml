@@ -41,6 +41,6 @@ sky:
     user-token-name: authentication
   alioss:
     endpoint: ${sky.alioss.endpoint}
-    accessKeyId: ${sky.alioss.accessKeyId}
-    accessKeySecret: ${sky.alioss.accessKeySecret}
-    bucketName: ${sky.alioss.bucketName}
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
