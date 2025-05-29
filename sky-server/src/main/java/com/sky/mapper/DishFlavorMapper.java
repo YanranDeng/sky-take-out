@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface DishFlavorsMapper {
+public interface DishFlavorMapper {
 
     /**
      * 批量插入口味数据
