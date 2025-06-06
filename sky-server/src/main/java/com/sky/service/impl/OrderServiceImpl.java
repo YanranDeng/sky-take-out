@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -190,8 +191,17 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      */
     @Override
-    public void reminder(String id) {
-        orderMapper.getByNumber(id);
+    public void reminder(Long id) {
+
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Map map = new HashMap();
+        map.put("type",2);
+        map.put("orderId",id);
+        map.put("content","订单号：" + orders.getNumber());
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 
     /**
@@ -233,21 +243,24 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public void deliver(Long id) {
-        Orders orders = Orders.builder()
-                .id(id)
-                .status(Orders.DELIVERY_IN_PROGRESS)
-                .payStatus(Orders.DELIVERY_IN_PROGRESS)
-                .build();
-
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orders.setPayStatus(Orders.DELIVERY_IN_PROGRESS);
         orderMapper.update(orders);
 
     }
 
     @Override
     public OrderVO getDetails(Long id) {
-        Orders order = orderMapper.getById(id);
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
         OrderVO orderVO = new OrderVO();
-        BeanUtils.copyProperties(order,orderVO);
+        BeanUtils.copyProperties(orders,orderVO);
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
         orderVO.setOrderDetailList(orderDetailList);
         return orderVO;
@@ -255,63 +268,59 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
-        Orders orders = Orders.builder()
-                .id(ordersConfirmDTO.getId())
-                .status(Orders.CONFIRMED)
-                .payStatus(Orders.CONFIRMED)
-                .build();
-
+        Orders orders = orderMapper.getById(ordersConfirmDTO.getId());
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        orders.setStatus(Orders.CONFIRMED);
+        orders.setPayStatus(Orders.CONFIRMED);
         orderMapper.update(orders);
     }
 
     @Override
     public void complete(Long id) {
-        Orders orders = Orders.builder()
-                .id(id)
-                .status(Orders.COMPLETED)
-                .payStatus(Orders.COMPLETED)
-                .build();
-
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        orders.setStatus(Orders.COMPLETED);
+        orders.setPayStatus(Orders.COMPLETED);
         orderMapper.update(orders);
     }
 
     @Override
     public void cancel(OrdersCancelDTO ordersCancelDTO) {
-//        Long id = ordersCancelDTO.getId();
-//        Orders orders = orderMapper.getById(id);
-//        Integer status = orders.getStatus();
-//        if(status == Orders.TO_BE_CONFIRMED){
-//
-//        }else{
-//
-//        }
-        Orders orders = Orders.builder()
-                .id(ordersCancelDTO.getId())
-                .status(Orders.CANCELLED)
-                .payStatus(Orders.REFUND)
-                .cancelReason(ordersCancelDTO.getCancelReason())
-                .cancelTime(LocalDateTime.now())
-                .amount(new BigDecimal("0"))
-                .build();
-
+        Orders orders = orderMapper.getById(ordersCancelDTO.getId());
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        orders.setStatus(Orders.CANCELLED);
+        orders.setPayStatus(Orders.REFUND);
+        orders.setCancelReason(ordersCancelDTO.getCancelReason());
+        orders.setCancelTime(LocalDateTime.now());
+        orders.setAmount(new BigDecimal("0"));
         orderMapper.update(orders);
     }
 
     @Override
     public void reject(OrdersRejectionDTO ordersRejectionDTO) {
-        Orders orders = Orders.builder()
-                .id(ordersRejectionDTO.getId())
-                .status(Orders.CANCELLED)
-                .payStatus(Orders.REFUND)
-                .rejectionReason(ordersRejectionDTO.getRejectionReason())
-                .amount(new BigDecimal("0"))
-                .build();
-
+        Orders orders = orderMapper.getById(ordersRejectionDTO.getId());
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        orders.setStatus(Orders.CANCELLED);
+        orders.setPayStatus(Orders.REFUND);
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setAmount(new BigDecimal("0"));
         orderMapper.update(orders);
     }
 
     @Override
     public void repete(Long id) {
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
         for (OrderDetail orderDetail : orderDetailList) {
             ShoppingCart shoppingCart = new ShoppingCart();

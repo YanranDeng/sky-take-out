@@ -12,6 +12,7 @@ import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -66,17 +67,17 @@ public class OrderController {
         return Result.success(pageResult);
     }
 
-//    /**
-//     * 用户催单
-//     * @param id
-//     * @return
-//     */
-//    @GetMapping("/reminder/{id}")
-//    @ApiOperation("用户催单")
-//    public Result reminder(@PathVariable String id){
-//        orderService.reminder(id);
-//        return Result.success();
-//    }
+    /**
+     * 用户催单
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("用户催单")
+    public Result reminder(@PathVariable Long id){
+        orderService.reminder(id);
+        return Result.success();
+    }
 
     /**
      * 查看订单详情
@@ -105,6 +106,11 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * 再来一单
+     * @param id
+     * @return
+     */
     @PostMapping("/repetition/{id}")
     @ApiOperation("再来一单")
     public Result repete(@PathVariable Long id){

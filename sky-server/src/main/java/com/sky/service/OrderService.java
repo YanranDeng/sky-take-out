@@ -28,7 +28,7 @@ public interface OrderService {
      */
     void paySuccess(String outTradeNo);
 
-    void reminder(String id);
+    void reminder(Long id);
 
     PageResult pageQuery4User(OrdersPageQueryDTO ordersPageQueryDTO);
     PageResult pageQuery4Admin(OrdersPageQueryDTO ordersPageQueryDTO);
