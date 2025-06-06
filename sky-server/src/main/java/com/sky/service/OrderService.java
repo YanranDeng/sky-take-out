@@ -27,4 +27,23 @@ public interface OrderService {
      * @param outTradeNo
      */
     void paySuccess(String outTradeNo);
+
+    void reminder(String id);
+
+    PageResult pageQuery4User(OrdersPageQueryDTO ordersPageQueryDTO);
+    PageResult pageQuery4Admin(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    void deliver(Long id);
+
+    OrderVO getDetails(Long id);
+
+    void confirm(OrdersConfirmDTO ordersConfirmDTO);
+
+    void complete(Long id);
+
+    void cancel(OrdersCancelDTO ordersCancelDTO);
+
+    void reject(OrdersRejectionDTO ordersRejectionDTO);
+
+    void repete(Long id);
 }
