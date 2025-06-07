@@ -69,4 +69,14 @@
         </where>
         order by order_time desc
     </select>
+    <select id="sumByMap" resultType="java.lang.Double">
+        select sum(amount) from orders
+        <where>
+            <if test="begin != null"> <![CDATA[ and order_time >= #{begin} ]]> </if>
+            <if test="end != null"> <![CDATA[ and order_time <= #{end} ]]> </if>
+            <if test="status != null">and status = #{status}</if>
+
+        </where>
+
+    </select>
 </mapper>
