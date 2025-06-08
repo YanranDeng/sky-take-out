@@ -79,4 +79,21 @@
         </where>
 
     </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="begin != null"> <![CDATA[ and order_time >= #{begin} ]]> </if>
+            <if test="end != null"> <![CDATA[ and order_time <= #{end} ]]> </if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+    </select>
+    <select id="getSalesTop10" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name, sum(od.number) number from orders o,order_detail od
+        where od.order_id = o.id and o.status = 5
+        <if test="begin != null"> <![CDATA[ and o.order_time >= #{begin} ]]></if>
+        <if test="end != null"> <![CDATA[ and o.order_time <= #{end} ]]></if>
+        group by od.name
+        order by number desc
+        limit 0,10
+    </select>
 </mapper>

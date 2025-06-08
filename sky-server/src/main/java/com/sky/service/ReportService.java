@@ -15,4 +15,10 @@ public interface ReportService {
     TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end);
 
     UserReportVO getUserStatistics(LocalDate begin, LocalDate end);
+
+    OrderReportVO getOderStatistics(LocalDate begin, LocalDate end);
+
+    SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end);
+
+    void exportBusinessData(HttpServletResponse response);
 }
