@@ -46,4 +46,6 @@ public interface OrderService {
     void reject(OrdersRejectionDTO ordersRejectionDTO);
 
     void repete(Long id);
+
+    OrderStatisticsVO statistics();
 }

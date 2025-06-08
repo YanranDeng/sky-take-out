@@ -18,10 +18,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
-import com.sky.vo.DishVO;
-import com.sky.vo.OrderPaymentVO;
-import com.sky.vo.OrderSubmitVO;
-import com.sky.vo.OrderVO;
+import com.sky.vo.*;
 import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -168,6 +165,9 @@ public class OrderServiceImpl implements OrderService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(userId);
+        orders.setAddress(addressBook.getCityName()+addressBook.getDistrictName()+addressBook.getDetail());
+        orders.setAddressBookId(ordersSubmitDTO.getAddressBookId());
+        orders.setUserName(userMapper.getById(userId).getName());
         orderMapper.insert(orders);
 
         //3. 向订单明细表插入n条数据
@@ -298,6 +298,9 @@ public class OrderServiceImpl implements OrderService {
         return new PageResult(page.getTotal(),page.getResult());
     }
 
+    /**
+     * 用户查看历史订单
+     */
     @Override
     public PageResult pageQuery4Admin(OrdersPageQueryDTO ordersPageQueryDTO) {
         PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
@@ -326,6 +329,8 @@ public class OrderServiceImpl implements OrderService {
         }
         orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
         orders.setPayStatus(Orders.DELIVERY_IN_PROGRESS);
+        orders.setDeliveryTime(LocalDateTime.now());
+        orders.setDeliveryStatus(1);
         orderMapper.update(orders);
 
     }
@@ -349,7 +354,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 已接单
+     * 接单
      * @param ordersConfirmDTO
      */
     @Override
@@ -434,6 +439,28 @@ public class OrderServiceImpl implements OrderService {
             shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartMapper.insert(shoppingCart);
         }
+    }
+
+    @Override
+    public OrderStatisticsVO statistics() {
+        Map map = new HashMap<>();
+        map.put("status",Orders.TO_BE_CONFIRMED);
+        Integer toBeConfirmed = orderMapper.countByMap(map);
+        toBeConfirmed = toBeConfirmed == null ? 0 : toBeConfirmed;
+
+        map.put("status",Orders.COMPLETED);
+        Integer confirmed = orderMapper.countByMap(map);
+        confirmed = confirmed == null ? 0 : confirmed;
+
+        map.put("status",Orders.DELIVERY_IN_PROGRESS);
+        Integer deliveryInProgress = orderMapper.countByMap(map);
+        deliveryInProgress = deliveryInProgress == null ? 0 : deliveryInProgress;
+
+        return OrderStatisticsVO.builder()
+                .confirmed(confirmed)
+                .toBeConfirmed(toBeConfirmed)
+                .deliveryInProgress(deliveryInProgress)
+                .build();
     }
 
 
